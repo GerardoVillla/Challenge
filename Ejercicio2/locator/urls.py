@@ -1,12 +1,10 @@
 from django.urls import path, include
-from .views import UrlView
+from . import views
 from rest_framework.routers import DefaultRouter
 
-
-router = DefaultRouter()
-router.register(r'url', UrlView, 'url')
 urlpatterns = [
-    path('api/', include(router.urls))
+    path('create/', views.create_public_url),
+    path('create-auth/', views.create_private_url),
 ]
 
 

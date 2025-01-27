@@ -17,11 +17,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from authentication import views
+from locator.views import redirect_to_url
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("locator/", include("locator.urls")),
     path('api-token/login/', views.login),
     path('api-token/register/', views.register),
-    path('api-token/profile/', views.profile)
+    path('api-token/profile/', views.profile),
+    path('<str:short_code>/', redirect_to_url)
     
 ]
