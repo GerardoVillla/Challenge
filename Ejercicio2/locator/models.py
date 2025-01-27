@@ -1,16 +1,16 @@
 from django.db import models
 from django.db.models import Model
-from django.contrib.auth.models import User
+from authentication.models import CustomUser
 
 # Create your models here.
 
 
 class Url(models.Model): 
-    original_url = models.CharField(max_length=5000)
+    original_url = models.URLField(max_length=5000)
+    short_url = models.CharField(max_length=5000, unique=True)
     is_public = models.BooleanField(default=True)
-    short_url = models.CharField(max_length=5000)
-    clicks = models.IntegerField(default=0)
-    ##id_user = models.ForeignKey(User, on_delete=models.CASCADE)
+    clicks = models.PositiveIntegerField(default=0)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True)
     created = models.DateTimeField(auto_now_add=True)
     
     class Meta:
