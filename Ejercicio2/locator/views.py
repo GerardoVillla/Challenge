@@ -60,7 +60,7 @@ def create_private_url(request):
 @api_view(['DELETE'])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
-def create_private_url(request):
+def delete_private_url(request):
     original_url = request.data['original_url']
     url = Url.objects.filter(original_url=original_url, is_public=False, user=request.user).first()
     url.delete()
