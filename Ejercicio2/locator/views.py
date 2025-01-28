@@ -1,5 +1,6 @@
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404
+from django.utils.decorators import method_decorator
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -9,6 +10,8 @@ from .models import Url
 from .serializer import UrlSerializer
 from .services import shorten_url, is_unique_public_url, get_unique_short_url
 from rest_framework.decorators import api_view
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 from django.shortcuts import redirect as django_redirect
 class BaseUrlViewSet(viewsets.GenericViewSet):
     serializer_class = UrlSerializer
@@ -45,13 +48,13 @@ class UrlViewSet(BaseUrlViewSet):
         return Response(self.build_response(url), status=status.HTTP_201_CREATED)
     
     def _delete_url(self, is_public):
-        id = self.request.query_params['id']
+        id = self.kwargs['pk']
         url = get_object_or_404(self.get_queryset(), id=id)
         url.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     
     def _update_url(self, is_public):
-        id = self.request.query_params['id']
+        id = self.kwargs['pk']
         new_url = self.request.data['new_url']
         
         url = get_object_or_404(self.get_queryset(), id=id)
@@ -64,15 +67,35 @@ class UrlViewSet(BaseUrlViewSet):
         is_public = not self.request.user.is_authenticated
         return self._create_url(request.data, is_public)
     
-    def delete(self, request):
+    def delete(self, request, pk):
         is_public = not self.request.user.is_authenticated
         return self._delete_url(is_public)
     
-    def patch(self, request):
+    def patch(self, request, pk):
         is_public = not self.request.user.is_authenticated
         return self._update_url(is_public)
-    
-    @action(detail=False, methods=['post'])
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'urls': openapi.Schema(
+                    type=openapi.TYPE_ARRAY,
+                    items=openapi.Schema(
+                        type=openapi.TYPE_OBJECT,
+                        properties={
+                            'original_url': openapi.Schema(type=openapi.TYPE_STRING),
+                            'is_public': openapi.Schema(type=openapi.TYPE_BOOLEAN),
+                        },
+                        required=['original_url']
+                    ),
+                    description="Array of URLs to be shortened"
+                )
+            },
+            required=['urls']
+        ),
+        responses={201: 'URLs created successfully', 400: 'Invalid input'}
+    )
+    @action(detail=False, methods=['post'],)
     def create_massive(self, request):
         urls = request.data.get('urls', [])
         
@@ -90,9 +113,9 @@ class UrlViewSet(BaseUrlViewSet):
             response.append(url.data)
         
         return Response(response, status=status.HTTP_201_CREATED)
-    @action(detail=False, methods=['get'])
-    def list_massive(self, request):
-        page_number = request.query_params.get('page', 1)
+    @action(detail=False, methods=['get'], url_path='list/(?P<page>[0-9]+)')
+    def list_massive(self, request, page=1):
+        page_number = page
         paginator = Paginator(self.get_queryset(), 20)
         page = paginator.get_page(page_number)
         serializer = self.get_serializer(page, many=True)

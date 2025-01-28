@@ -11,6 +11,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 @api_view(['POST'])
 def login(request):
+    if 'email' not in request.data or 'password' not in request.data:
+        return Response({"error" : "Invalid input "}, status=status.HTTP_400_BAD_REQUEST)
     user = get_object_or_404(CustomUser, email = request.data['email'])
     if not user.check_password(request.data['password']):
         return Response({"error" : "Invalid credentials "}, status=status.HTTP_400_BAD_REQUEST)

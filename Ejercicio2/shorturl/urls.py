@@ -18,12 +18,25 @@ from django.contrib import admin
 from django.urls import path, include
 from authentication import views
 from locator.views import redirect
+from drf_yasg import openapi
+from drf_yasg.views import get_schema_view
+
+schema_view = get_schema_view(
+    openapi.Info(
+        title="Short URL API",
+        default_version='v1.0.0',
+        description="API for shortening URLs",
+    ),
+    public=True,
+)
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("urls/", include("locator.urls")),
-    path('api-token/login/', views.login),
-    path('api-token/register/', views.register),
-    path('api-token/profile/', views.profile),
+    path("url/", include("locator.urls")),
     path('<str:short_code>/',redirect),
+    path('auth/login/', views.login),
+    path('auth/register/', views.register),
+    path('auth/profile/', views.profile),
+    path('swagger/docs', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger'),
     
 ]

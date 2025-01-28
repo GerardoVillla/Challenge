@@ -14,3 +14,4 @@ class Url(models.Model):
     
     class Meta:
         ordering = ['created']
+        
