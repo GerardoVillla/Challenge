@@ -41,6 +41,7 @@ http://127.0.0.1:8000/
 De acuerdo a los requerimientos de la prueba se presentan los servicios disponibles en la API:
 
 ### Autenticación
+Para la autenticación de los usuarios se usó el método [Token auth](https://www.django-rest-framework.org/api-guide/authentication/) de django.
 - **Crear usuario**: `POST /auth/register`
 - Body:
 ```json
