@@ -1,10 +1,9 @@
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404
-from django.utils.decorators import method_decorator
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.decorators import authentication_classes, permission_classes
+from rest_framework.decorators import authentication_classes
 from rest_framework.authentication import TokenAuthentication
 from .models import Url
 from .serializer import UrlSerializer
@@ -31,6 +30,9 @@ class BaseUrlViewSet(viewsets.GenericViewSet):
 class UrlViewSet(BaseUrlViewSet):
     
     def _create_url(self, data, is_public):
+        serializer = self.get_serializer(data=data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         original_url = data['original_url']
         host = self.request.get_host()
         if is_public and is_unique_public_url(original_url):
@@ -47,15 +49,21 @@ class UrlViewSet(BaseUrlViewSet):
         )
         return Response(self.build_response(url), status=status.HTTP_201_CREATED)
     
-    def _delete_url(self, is_public):
-        id = self.kwargs['pk']
+    def _delete_url(self):
+        try:
+            id = self.kwargs['pk']
+        except KeyError:
+            return Response({'error': 'Missing id in the request'}, status=status.HTTP_400_BAD_REQUEST)
         url = get_object_or_404(self.get_queryset(), id=id)
         url.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     
-    def _update_url(self, is_public):
-        id = self.kwargs['pk']
-        new_url = self.request.data['new_url']
+    def _update_url(self):
+        try:
+            id = self.kwargs['pk']
+            new_url = self.request.data['new_url']
+        except KeyError:
+            return Response({'error': 'Missing fields in the request'}, status=status.HTTP_400_BAD_REQUEST)
         
         url = get_object_or_404(self.get_queryset(), id=id)
         url.original_url = new_url
@@ -68,12 +76,10 @@ class UrlViewSet(BaseUrlViewSet):
         return self._create_url(request.data, is_public)
     
     def delete(self, request, pk):
-        is_public = not self.request.user.is_authenticated
-        return self._delete_url(is_public)
+        return self._delete_url()
     
     def patch(self, request, pk):
-        is_public = not self.request.user.is_authenticated
-        return self._update_url(is_public)
+        return self._update_url()
     @swagger_auto_schema(
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
@@ -100,7 +106,7 @@ class UrlViewSet(BaseUrlViewSet):
         urls = request.data.get('urls', [])
         
         if not isinstance(urls, list):
-            return Response({'error': 'Field "urls" must be a list'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Field urls must be a list'}, status=status.HTTP_400_BAD_REQUEST)
         
         response = []
         for url_data in urls:
