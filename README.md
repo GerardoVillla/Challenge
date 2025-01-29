@@ -46,7 +46,7 @@ Para la autenticación de los usuarios se usó el método [Token auth](https://w
 - Body:
 ```json
 {
-  "email": "someone@gmail.com"
+  "email": "someone@gmail.com",
   "password": "123"
 }
 ```
@@ -54,7 +54,7 @@ Para la autenticación de los usuarios se usó el método [Token auth](https://w
 - Body:
 ```json
 {
-  "email": "someone@gmail.com"
+  "email": "someone@gmail.com",
   "password": "123"
 }
 ```
@@ -62,7 +62,7 @@ Para la autenticación de los usuarios se usó el método [Token auth](https://w
 - Body:
 ```json
 {
-  "email": "someone@gmail.com"
+  "email": "someone@gmail.com",
   "password": "123"
 }
 ```
@@ -92,13 +92,13 @@ Para la creación, eliminación o actualización de URLs privadas se necesita de
 - Body:
 ```json
 {
-  "urls": [ {"original_url : ""https://www.amazon.com",
+  "urls": [ {"original_ur" : "https://www.amazon.com",
               "is_public" : true
             },
-            {"original_url : ""https://www.amazon.com",
+            {"original_url": "https://www.amazon.com",
               "is_public" : false
             }
-          ]
+    ]
 }
 ```
 
