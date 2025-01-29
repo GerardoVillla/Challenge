@@ -45,7 +45,8 @@ class UrlViewSet(BaseUrlViewSet):
             original_url=original_url,
             short_url=short_url,
             is_public=is_public,
-            user=self.request.user if not is_public else None
+            created_by=self.request.user if not is_public else None,
+            last_user=self.request.user if not is_public else None
         )
         return Response(self.build_response(url), status=status.HTTP_201_CREATED)
     
@@ -127,6 +128,6 @@ def redirect(request, short_code=None):
     if not request.user.is_authenticated and not url.is_public:
         return Response({'error': 'You do not have permission to access this URL'}, status=status.HTTP_403_FORBIDDEN)
     url.clicks += 1
-    url.user_id = request.user.id
+    url.last_user = request.user.email
     url.save()
     return django_redirect(url.original_url)

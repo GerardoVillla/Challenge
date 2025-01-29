@@ -9,7 +9,8 @@ class Url(models.Model):
     short_url = models.CharField(max_length=5000, unique=True)
     is_public = models.BooleanField(default=True)
     clicks = models.PositiveIntegerField(default=0)
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True)
+    last_user = models.TextField(null=True)
+    created_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True)
     created = models.DateTimeField(auto_now_add=True)
     
     class Meta:
