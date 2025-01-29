@@ -49,37 +49,29 @@ class UrlViewSet(BaseUrlViewSet):
         )
         return Response(self.build_response(url), status=status.HTTP_201_CREATED)
     
-    def _delete_url(self):
-        try:
-            id = self.kwargs['pk']
-        except KeyError:
-            return Response({'error': 'Missing id in the request'}, status=status.HTTP_400_BAD_REQUEST)
-        url = get_object_or_404(self.get_queryset(), id=id)
-        url.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-    
-    def _update_url(self):
-        try:
-            id = self.kwargs['pk']
-            new_url = self.request.data['new_url']
-        except KeyError:
-            return Response({'error': 'Missing fields in the request'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        url = get_object_or_404(self.get_queryset(), id=id)
-        url.original_url = new_url
-        url.save()
-        
-        return Response(self.build_response(url), status=status.HTTP_200_OK)
-    
     def create(self, request):
         is_public = not self.request.user.is_authenticated
         return self._create_url(request.data, is_public)
     
-    def delete(self, request, pk):
-        return self._delete_url()
+    def delete(self, request, pk=None):
+        if not pk:
+            return Response({'error': 'Missing id in the request'}, status=status.HTTP_400_BAD_REQUEST)
+        url = get_object_or_404(self.get_queryset(), id=pk)
+        url.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
     
-    def patch(self, request, pk):
-        return self._update_url()
+    def patch(self, request, pk=None):
+        try:
+            new_url = self.request.data['new_url']
+        except KeyError:
+            return Response({'error': 'Missing new_url in the request'}, status=status.HTTP_400_BAD_REQUEST)
+        if not pk:
+            return Response({'error': 'Missing id in the request'}, status=status.HTTP_400_BAD_REQUEST)
+        url = get_object_or_404(self.get_queryset(), id=pk)
+        url.original_url = new_url
+        url.save()
+        
+        return Response(self.build_response(url), status=status.HTTP_200_OK)
     @swagger_auto_schema(
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
