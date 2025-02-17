@@ -11,6 +11,8 @@ jobs:
     tests:
         runs-on: ubuntu-latest
         environment: CI
+        env:
+            DJANGO_SETTINGS_MODULE : shorturl.settings
         steps:
             - name: Checkout code
               uses: actions/checkout@v4
