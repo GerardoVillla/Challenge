@@ -2,3 +2,7 @@ django
 djangorestframework
 drf-yasg
 coreapi
+pytest
+pytest-django
+pytest-drf
+ruff

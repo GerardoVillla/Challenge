@@ -94,7 +94,7 @@ class UrlViewSet(BaseUrlViewSet):
         ),
         responses={201: 'URLs created successfully', 400: 'Invalid input'}
     )
-    @action(detail=False, methods=['post'],)
+    @action(detail=False, methods=['post'])
     def create_massive(self, request):
         urls = request.data.get('urls', [])
         
@@ -104,7 +104,7 @@ class UrlViewSet(BaseUrlViewSet):
         response = []
         for url_data in urls:
             is_public = url_data.get('is_public', False)
-            if type(is_public) != bool:
+            if not isinstance(is_public, bool):
                 return Response({'error': 'Field is_public must be boolean'}, status=status.HTTP_400_BAD_REQUEST)
             if not is_public and not self.request.user.is_authenticated:
                 return Response({'error': 'You do not have permission to create private URLs'}, status=status.HTTP_403_FORBIDDEN)
@@ -128,6 +128,7 @@ def redirect(request, short_code=None):
     if not request.user.is_authenticated and not url.is_public:
         return Response({'error': 'You do not have permission to access this URL'}, status=status.HTTP_403_FORBIDDEN)
     url.clicks += 1
-    url.last_user = request.user.email
+    if request.user.is_authenticated:
+        url.last_user = request.user.email    
     url.save()
     return django_redirect(url.original_url)

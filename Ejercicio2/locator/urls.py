@@ -6,6 +6,6 @@ router = DefaultRouter()
 router.register(r'', views.UrlViewSet, basename='urls')
 
 urlpatterns = [
-    path('', include(router.urls)),
-    path('<int:pk>', views.UrlViewSet.as_view({'delete': 'delete', 'patch': 'patch'})),
+    path('url', include(router.urls)),
+    path('<int:pk>', views.UrlViewSet.as_view({'delete': 'delete', 'patch': 'patch'} ), name='urls-detail'),
 ]
