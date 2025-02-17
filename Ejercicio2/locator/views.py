@@ -104,7 +104,7 @@ class UrlViewSet(BaseUrlViewSet):
         response = []
         for url_data in urls:
             is_public = url_data.get('is_public', False)
-            if type(is_public) != bool:
+            if not isinstance(is_public, bool):
                 return Response({'error': 'Field is_public must be boolean'}, status=status.HTTP_400_BAD_REQUEST)
             if not is_public and not self.request.user.is_authenticated:
                 return Response({'error': 'You do not have permission to create private URLs'}, status=status.HTTP_403_FORBIDDEN)

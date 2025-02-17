@@ -1,9 +1,7 @@
 import pytest
 from django.urls import reverse
-from locator.views import redirect
 from rest_framework import status
 from rest_framework.test import APIClient
-from locator.models import Url
 @pytest.fixture
 def api_client():
     return APIClient()
@@ -23,7 +21,6 @@ def test_create_public_url(api_client):
     
 @pytest.mark.django_db
 def test_create_private_url(api_client, django_user_model):
-    user = django_user_model.objects.create_user(email='testuser@gmail.com', password='testpass')
     api_client.login(username='testuser', password='testpass')
     url = reverse('urls-list')
     data = {'original_url': 'https://google.com',} 
