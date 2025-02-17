@@ -33,7 +33,7 @@ schema_view = get_schema_view(
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("url/", include("locator.urls")),
-    path('<str:short_code>/',redirect),
+    path('<str:short_code>/',redirect, name='redirect'),
     path('auth/login/', views.login),
     path('auth/register/', views.register),
     path('auth/profile/', views.profile),
