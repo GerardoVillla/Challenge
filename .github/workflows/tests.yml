@@ -12,7 +12,7 @@ jobs:
         runs-on: ubuntu-latest
         environment: CI
         env:
-            DJANGO_SETTINGS_MODULE : shorturl.settings
+            DJANGO_SETTINGS_MODULE : Ejercicio2.settings
         steps:
             - name: Checkout code
               uses: actions/checkout@v4
