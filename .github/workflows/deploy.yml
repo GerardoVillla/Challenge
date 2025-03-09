@@ -1,0 +1,30 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Deploy to EC2
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}  # IP pública
+          EC2_USER: ec2-user
+          EC2_KEY: ${{ secrets.EC2_SSH_KEY }}  # Contenido del archivo .pem
+        run: |
+          echo "$EC2_KEY" > private_key.pem
+          chmod 600 private_key.pem
+          ssh -o StrictHostKeyChecking=no -i private_key.pem $EC2_USER@$EC2_HOST << 'EOF'
+            cd ~/Ejercicio2
+            git pull origin main
+            pip3 install -r requirements.txt
+            python3 manage.py migrate
+            sudo systemctl restart gunicorn
+            sudo systemctl restart nginx
+          EOF
+          rm private_key.pem
