@@ -10,6 +10,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     environment: CI
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}  # Solo si ambos pasan
     steps:
       - uses: actions/checkout@v4
       
