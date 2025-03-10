@@ -2,8 +2,6 @@ name: Deploy to EC2
 
 on:
   push:
-    branches:
-      - main
 	workflow_run:
     	workflows: ["Run tests", "Run ruff"]  # Nombres de los workflows
     	branches: [main]
