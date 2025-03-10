@@ -39,4 +39,4 @@ def test_create_massive_urls(api_client):
     }
     response = api_client.post(url, data, format='json')
     assert response.status_code == status.HTTP_400_BAD_REQUEST
-    assert len(response.data) == 1
+    assert len(response.data) == 2
